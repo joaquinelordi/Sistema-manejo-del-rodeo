@@ -2,7 +2,7 @@
 #include "mbed.h"
 #include "rfid.h"
 #include "MFRC522.h"
-#include "string.h"
+#include <string.h>
 
 //=====[Declaration of private defines]========================================
 
@@ -55,6 +55,8 @@ void rfidUpdate()
                 sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
                 
             }
+            // termino la cadena con un \0
+            buffer[RfChip.uid.size * 2] = '\0';
             printf("%s\n",buffer);
             
             // Print Card type
@@ -83,8 +85,18 @@ char * rfidReadUID()
     if(rfidStatus != RFID_READ_COMPLETED_VALID_CARD)
         return NULL;
 
-    char* aux=strndup(buffer,10);
-    buffer[0]={'\0'};
+    char* aux = new char[strlen(buffer)]; // Reserva memoria suficiente para la cadena
+
+    // Copiar el contenido de buffer al puntero auxiliar
+    char * aux2 = strcpy(aux, buffer);
+
+    // Mostrar el resultado en la consola
+    printf("UID: %s\n", buffer);
+    printf("Aux: %s\n", aux);
+    
+    // limpio el buffer
+    memset(buffer, 0, sizeof(buffer));
     rfidStatus=RFID_IDLE;//Ya procese el uid ingresado a si que vuelvo a modo de esepra
     return aux;
+
 }

@@ -6,6 +6,7 @@
 #define RFID_DEBUG
 
 #include <string>
+#include "my_stdlib.h"
 
 //=====[Declaration of public defines]=========================================
 
@@ -36,3 +37,4 @@ std::string rfidRead();
 //=====[#include guards - end]=================================================
 
 #endif // _RFID_H_
+
