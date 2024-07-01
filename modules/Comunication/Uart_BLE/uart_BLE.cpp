@@ -1,5 +1,6 @@
 //=====[Libraries]=============================================================
 #include "mbed.h"
+#include "uart_BLE.h"
 #include "my_stdlib.h"
 #include <queue>
 #include <cstring>
@@ -30,6 +31,8 @@ std::queue<char> rxBuffer;
 
 //=====[Declaration and initialization of private global variables]============
 
+static uartStatus_t uartState;
+
 //=====[Declarations (prototypes) of private functions]========================
 
 static void comWrite(const char* str);
@@ -40,27 +43,51 @@ static void rxBuffer_isr();
 
 void comInit()
 {
-    uartBLE.attach(&rxBuffer_isr, Serial::RxIrq);
+    printf("comInit -> Inicio \n");
+    //uartBLE.attach(&rxBuffer_isr, Serial::RxIrq);
 }
 
 void comUpdate()
 {
-    // Si hay cosas para escribir se intenta escribir
-    comWrite("Boca Boocaaa");
-    wait_us(TO_MILISEC * 2000);
-    
-    // Si hay cosas para leer se lee
-    char* receivedMsg = comRead();
-    if (receivedMsg != NULL) {
-        printf("UART recibi: [%s]\n", receivedMsg);
-        free(receivedMsg); // Liberar la memoria asignada por comRead
+    printf("comUpdate -> Inicio \n");
+/*
+    switch(uartState)
+    {
+        // hay algo para transmitir
+        case TX_STATUS:
+            // espero un tiempo para transmitir
+            wait_us(TO_MILISEC * 2000);
+            comWrite("AT");
+
+            break;
+
+        case RX_STATUS:
+            // hay algo para leer
+            char* receivedMsg = comRead();
+            if (receivedMsg != NULL)
+            {
+                printf("UART recibi: [%s]\n", receivedMsg);
+                free(receivedMsg); // Liberar la memoria asignada por comRead
+            }
+
+            break;    
     }
+*/
+
+    return;
+}
+
+void BLEWrite(const char * str)
+{
+    comWrite("Boca Boocaaa");
 }
 
 //=====[Implementations of private functions]==================================
 
 static void comWrite(const char* str)
 {
+    //  paso a estado quiero transmitir datos
+    uartState = TX_STATUS;
     printf("UART escribo: %s\n", str);
     uartBLE.printf("%s", str);
 }
@@ -73,40 +100,49 @@ static char* comRead()
     std::queue<char> localBuffer;
 
     // Transferir datos del buffer global al buffer local
-    while (!rxBuffer.empty()) {
+    while (!rxBuffer.empty())
+    {
         c = rxBuffer.front();
         rxBuffer.pop();
         localBuffer.push(c);
-        if (c == '\0') {
+        if (c == '\0')
+        {
             break;
         }
     }
 
     // Calcular la longitud del mensaje
     int length = localBuffer.size();
-    if (length == 0) {
+    if (length == 0)
+    {
         return NULL;
     }
 
     // Asignar memoria para el mensaje
     char* sBuffer = (char*)malloc(length + 1);
-    if (sBuffer == NULL) {
+    if (sBuffer == NULL)
+    {
         return NULL;
     }
 
     // Copiar el mensaje desde el buffer local a la cadena
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++)
+    {
         sBuffer[i] = localBuffer.front();
         localBuffer.pop();
     }
     sBuffer[length] = '\0';
+
+    //  paso a modo recibi datos
+    uartState = RX_STATUS;
 
     return sBuffer;
 }
 
 static void rxBuffer_isr()
 {
-    while (uartBLE.readable()) {
+    while (uartBLE.readable())
+    {
         printf("UART leyendo datos\n");
         rxBuffer.push(uartBLE.getc());
     }

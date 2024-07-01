@@ -20,7 +20,7 @@ int main()
 
 #include "mbed.h"
 #include "rfid.h"
-//#include "uart_module.h"
+#include "uart_BLE.h"
 #include "relay.h"
 
 
@@ -29,9 +29,35 @@ DigitalOut led1(LED1);
 int main()
 {
     rfidInit();
-    //comInit();
+    comInit();
     relayInit();
+
+    while(true)
+    {
+        led1 = !led1;
+        printf("En el loop principal  \n");
+        BLEWrite("BOCAA");
+        wait_us(TO_MILISEC * 2000);
+        //comUpdate();
+    }
+
+
 /*
+    while(true)
+    {
+        led1 = !led1;
+        rfidUpdate();
+        wait_us(TO_MILISEC * 2000);
+        relayUpdate();
+        //comUpdate();
+
+    }
+*/
+
+    return 0;
+}
+
+/* PRUEBA DE RELAY
     while(true)
     {
         led1 = !led1;
@@ -45,15 +71,3 @@ int main()
         wait_us(TO_MILISEC * 1000);
     }
 */
-
-    while(true)
-    {
-        led1 = !led1;
-        rfidUpdate();
-        wait_us(TO_MILISEC * 2000);
-        //relayUpdate();
-        //comUpdate();
-
-    }
-
-}

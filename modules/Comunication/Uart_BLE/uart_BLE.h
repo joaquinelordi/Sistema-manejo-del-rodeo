@@ -11,7 +11,10 @@
 
 //=====[Declaration of public data types]======================================
 
-
+typedef enum{
+    TX_STATUS,
+    RX_STATUS
+} uartStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
 
@@ -19,6 +22,7 @@ void comInit();
 
 void comUpdate();
 
+void BLEWrite(const char *);
 
 //=====[#include guards - end]=================================================
 
