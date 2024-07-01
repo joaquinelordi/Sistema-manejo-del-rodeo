@@ -2,7 +2,6 @@
 #include "mbed.h"
 #include "rfid.h"
 #include "MFRC522.h"
-#include <stdio.h>
 #include <string.h>
 
 //=====[Declaration of private defines]========================================
