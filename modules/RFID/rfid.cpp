@@ -1,6 +1,7 @@
 //=====[Libraries]=============================================================
 #include "mbed.h"
 #include "rfid.h"
+#include "relay.h"
 #include "MFRC522.h"
 #include <string.h>
 
@@ -40,7 +41,7 @@ void rfidInit()
 
 void rfidUpdate()
 {
-    printf("rfidUpdate() -> Fin \n");
+    printf("rfidUpdate() -> Inicio \n");
 
     switch(rfidStatus)
     {
@@ -107,11 +108,13 @@ void rfidUpdate()
 
 char* rfidReadUID()
 {
+
     if (rfidStatus != RFID_READ_COMPLETED_VALID_CARD)
     {
         printf("rfidReadUID() -> estado invalido \n");
         return NULL;
     }
+
     // Reservar memoria para la cadena UID
     char* aux = (char*)malloc(my_strlen(buffer) + 1);
     if (aux == NULL)
@@ -129,7 +132,22 @@ char* rfidReadUID()
     
     // Limpiar el buffer
     memset(buffer, 0, sizeof(buffer));
+    
+    printf("rfidReadUID() -> RelayON \n");
+
     rfidStatus = RFID_IDLE; // Ya procesé el UID ingresado, así que vuelvo a modo de espera
 
     return aux;
 }
+
+/* PARA PROBAR LA ACTIVACION DEL RELAY 
+
+    relayON();
+    relayUpdate();
+    wait_us(TO_MILISEC * 1500);
+
+    printf("rfidReadUID() -> RelayOFF \n");
+    
+    relayOFF();
+    relayUpdate();
+*/

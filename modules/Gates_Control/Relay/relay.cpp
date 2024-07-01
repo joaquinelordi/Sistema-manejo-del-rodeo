@@ -27,13 +27,14 @@ DigitalInOut RelayIn2(IN_2);
 
 //=====[Declaration and initialization of private global variables]============
 
-
+static relayStatus_t relayStatus;
 
 //=====[Implementations of public functions]===================================
 
 void relayInit()
 {
     // Relay Init: OpenDrain y como entrada es alta impedancia = apagado
+    relayStatus = RELAY_OFF;
     RelayIn1.mode(OpenDrain);
     RelayIn1.input();
     RelayIn2.mode(OpenDrain);
@@ -45,17 +46,33 @@ void relayInit()
 // Debe modificar el estado de los reles en funcion del estado del control en las puertas
 void relayUpdate()
 {
-    // Relay ON
-    RelayIn1.output();                                     
-    RelayIn1 = LOW;    
-    RelayIn1.output();
-    RelayIn2 = LOW;
+    switch (relayStatus)
+    {
+        case RELAY_ON:
+            RelayIn1.output();                                     
+            RelayIn1 = LOW;    
+            //RelayIn2.output();
+            //RelayIn2 = LOW;
+            
+            break;
 
-    // Relay OFF
+        case RELAY_OFF:
     
-    RelayIn1.input();
-    RelayIn2.input();
+            RelayIn1.input();
+            //RelayIn2.input();
+
+            break;
       
+    }
 
+}
 
+void relayON()
+{
+    relayStatus = RELAY_ON;
+}
+
+void relayOFF()
+{
+    relayStatus = RELAY_OFF;
 }

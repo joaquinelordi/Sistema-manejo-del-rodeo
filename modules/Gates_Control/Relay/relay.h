@@ -7,19 +7,23 @@
 
 //=====[Declaration of public defines]=========================================
 
-
+// Nucleo Pin for Relay-2CH
+#define IN_1        PA_1
+#define IN_2        PA_0
 
 //=====[Declaration of public data types]======================================
 
-// Nucleo Pin for Relay-2CH
-#define IN_1        PA_9
-#define IN_2        PA_10
+typedef enum{
+    RELAY_ON,
+    RELAY_OFF
+} relayStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
 
 void relayInit();
 void relayUpdate();
-
+void relayON();
+void relayOFF();
 
 //=====[#include guards - end]=================================================
 
