@@ -2,9 +2,11 @@
 #include "mbed.h"
 #include "rfid.h"
 #include "MFRC522.h"
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
 
 //=====[Declaration of private defines]========================================
+
 
 //=====[Declaration of private data types]=====================================
 
@@ -24,8 +26,6 @@ DigitalOut LedGreen(LED1);
 //=====[Declaration and initialization of private global variables]============
 
 static char buffer[BUFFER_SIZE] = {'\0'};
-static string str;
-
 static rfidStatus_t rfidStatus;
 
 //=====[Implementations of public functions]===================================
@@ -41,50 +41,96 @@ void rfidInit()
 
 void rfidUpdate()
 {
-    // hay una tarjeta presente
-    if (RfChip.PICC_IsNewCardPresent())
+    printf("rfidUpdate() -> Fin \n");
+
+    switch(rfidStatus)
     {
-        //lei una tarjeta valida
-        if (RfChip.PICC_ReadCardSerial())
-        {
-            rfidStatus = RFID_READ_COMPLETED_VALID_CARD;
-            // Print Card UID
-            printf("Card UID: ");
-            for (uint8_t i = 0; i < RfChip.uid.size; i++)
+        case RFID_IDLE:
+            if (RfChip.PICC_IsNewCardPresent())
+                rfidStatus = RFID_READING;
+
+            else
+                printf("IDLE: No lei ninguna tarjeta\r\n"); 
+
+            break;
+
+        case RFID_READING:
+            if (RfChip.PICC_IsNewCardPresent())
             {
-                sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
-                
+                // lei una tarjeta valida
+                if (RfChip.PICC_ReadCardSerial())
+                {
+                    // Print Card UID
+                    printf("Card UID: ");
+                    for (uint8_t i = 0; i < RfChip.uid.size; i++)
+                    {
+                        sprintf(buffer + i * 2, "%02X", RfChip.uid.uidByte[i]);
+                    }
+                    // termino la cadena con un \0
+                    buffer[RfChip.uid.size * 2] = '\0';
+                    printf("Buffer[%s]\n", buffer);
+                    
+                    // Print Card type
+                    uint8_t piccType = RfChip.PICC_GetType(RfChip.uid.sak);
+                    printf("PICC Type: %s \n\r", RfChip.PICC_GetTypeName(piccType));
+
+                    // proceso la tarjeta y luego cambio el estado
+                    rfidStatus = RFID_READ_COMPLETED_VALID_CARD;
+                }
+                else
+                {
+                    printf("card is reading\r\n");
+                }
+
             }
-            printf("%s\n",buffer);
-            
-            // Print Card type
-            uint8_t piccType = RfChip.PICC_GetType(RfChip.uid.sak);
-            printf("PICC Type: %s \n\r", RfChip.PICC_GetTypeName(piccType));
-        }
-        // todavia no esta la lectura completada
-        else
-        {
-            rfidStatus = RFID_READING;
-            printf("card is reading\r\n");
-            //wait_us( TO_MILISEC * 500); 
-        }
-    }
-    else
-    {
-        printf("No lei ninguna tarjeta\r\n"); 
-        rfidStatus  = RFID_IDLE;
+            break;
+
+        case RFID_READ_COMPLETED_VALID_CARD:
+
+            printf("Tarjeta leida, esperando ser procesada\r\n");
+        
+            char * tagID = rfidReadUID();
+
+            if (tagID != NULL)
+            {
+                printf("tagID[%s]\n", tagID);
+            }
+
+            else
+                printf("tagID NULL");
+                
+            break;    
+
     }
 
-
+    printf("rfidUpdate() -> Fin \n");
 }
 
-char * rfidReadUID()
+char* rfidReadUID()
 {
-    if(rfidStatus != RFID_READ_COMPLETED_VALID_CARD)
+    if (rfidStatus != RFID_READ_COMPLETED_VALID_CARD)
+    {
+        printf("rfidReadUID() -> estado invalido \n");
         return NULL;
+    }
+    // Reservar memoria para la cadena UID
+    char* aux = (char*)malloc(my_strlen(buffer) + 1);
+    if (aux == NULL)
+    {
+        printf("rfidReadUID() -> Memory allocation failed\n");
+        return NULL;
+    }
 
-    char* aux=strndup(buffer,10);
-    buffer[0]={'\0'};
-    rfidStatus=RFID_IDLE;//Ya procese el uid ingresado a si que vuelvo a modo de esepra
+    // Copiar el contenido de buffer al puntero auxiliar
+    my_strcpy(aux, buffer);
+
+    // Mostrar el resultado en la consola
+    printf("rfidReadUID() -> UID: %s\n", buffer);
+    printf("rfidReadUID() -> Aux: %s\n", aux);
+    
+    // Limpiar el buffer
+    memset(buffer, 0, sizeof(buffer));
+    rfidStatus = RFID_IDLE; // Ya procesé el UID ingresado, así que vuelvo a modo de espera
+
     return aux;
 }

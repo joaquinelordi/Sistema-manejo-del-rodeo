@@ -6,6 +6,7 @@
 #define RFID_DEBUG
 
 #include <string>
+#include "my_stdlib.h"
 
 //=====[Declaration of public defines]=========================================
 
@@ -31,8 +32,9 @@ typedef enum{
 
 void rfidInit();
 void rfidUpdate();
-std::string rfidRead();
+char * rfidReadUID();
 
 //=====[#include guards - end]=================================================
 
 #endif // _RFID_H_
+

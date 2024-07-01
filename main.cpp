@@ -20,14 +20,24 @@ int main()
 
 #include "mbed.h"
 #include "rfid.h"
+//#include "uart_module.h"
+
+
+DigitalOut led1(LED1);
 
 int main()
 {
     rfidInit();
+    //comInit();
+    
 
     while(true)
     {
+        led1 = !led1;
         rfidUpdate();
+        wait_us(TO_MILISEC * 2000);
+        //comUpdate();
+
     }
 
 }
