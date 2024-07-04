@@ -1,23 +1,3 @@
-/* mbed Microcontroller Library
- * Copyright (c) 2019 ARM Limited
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/* EJEMPLO ORIGINAL DEL REPOSITORIO
-    #define TO_MILISEC 1000 //msec factor
-
-DigitalOut led1(LED1);
-
-int main()
-{
-    while (true)
-    {
-        led1 = !led1;
-        wait_us(TO_MILISEC * 500);
-    }
-}
-*/
-
 #include "mbed.h"
 #include "rfid.h"
 #include "uart_BLE.h"
@@ -34,40 +14,31 @@ int main()
 
     while(true)
     {
+        //printf("while principal \n");
         led1 = !led1;
-        printf("En el loop principal  \n");
+        //printf("En el loop principal  \n");
         BLEWrite("BOCAA");
-        wait_us(TO_MILISEC * 2000);
+        wait_us(TO_MILISEC * 4000);
         //comUpdate();
+        char buffer[BUFFER_SIZE];
+        if (comRead(buffer)) {
+            printf("Received: %s\n\n", buffer);
+        }
     }
+
+}
+
 
 
 /*
-    while(true)
-    {
-        led1 = !led1;
-        rfidUpdate();
-        wait_us(TO_MILISEC * 2000);
-        relayUpdate();
-        //comUpdate();
+DigitalOut myled(LED1);
 
-    }
-*/
-
-    return 0;
+int main() {
+  while(1) {
+    myled = 1;
+    wait(0.2);
+    myled = 0;
+    wait(0.2);
+  }
 }
-
-/* PRUEBA DE RELAY
-    while(true)
-    {
-        led1 = !led1;
-        printf("relay ON\n");
-        relayON();
-        relayUpdate();
-        wait_us(TO_MILISEC * 1000);
-        printf("relay OFF\n");
-        relayOFF();
-        relayUpdate();
-        wait_us(TO_MILISEC * 1000);
-    }
 */

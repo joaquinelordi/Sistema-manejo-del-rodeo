@@ -1,3 +1,11 @@
 {
-    "requires": ["bare-metal"]
+    "target_overrides": {
+        "*": {
+            "target.toolchain": "ARM",
+            "target.features_add": ["STORAGE"],
+            "platform.stdio-baud-rate": 115200,
+            "platform.stdio-convert-newlines": true,
+            "target.static_memory_defines": 1
+        }
+    }
 }

@@ -10,10 +10,11 @@
 
 //=====[Declaration of public defines]=========================================
 
+
+#define SPI_MOSI    PA_7    // Azul
+#define SPI_MISO    PA_6    // Verde
 #define SPI_SCK     PA_5    // Rojo
 #define SPI_CS      PA_4    // Marron
-#define SPI_MISO    PA_6    // Verde
-#define SPI_MOSI    PA_7    // Azul
 #define MF_RESET    PB_4    // Naranja
 
 #define TO_MILISEC 1000 //msec factor
@@ -37,4 +38,3 @@ char * rfidReadUID();
 //=====[#include guards - end]=================================================
 
 #endif // _RFID_H_
-

@@ -2,7 +2,6 @@
 #include "mbed.h"
 #include "uart_BLE.h"
 #include "my_stdlib.h"
-#include <queue>
 #include <cstring>
 
 //=====[Declaration of private defines]========================================
@@ -22,8 +21,8 @@
 
 Serial  uartBLE(TX, RX, COM_BAUDRATE);
 
-// Cola para almacenar caracteres leídos
-std::queue<char> rxBuffer;
+static char rxBuffer[BUFFER_SIZE];
+static volatile int rxIndex = 0;
 
 //=====[Declaration of external public global variables]=======================
 
@@ -37,14 +36,14 @@ static uartStatus_t uartState;
 
 static void comWrite(const char* str);
 static char* comRead();
-static void rxBuffer_isr();
+static void uartBLE_isr();
 
 //=====[Implementations of public functions]===================================
 
 void comInit()
 {
     printf("comInit -> Inicio \n");
-    //uartBLE.attach(&rxBuffer_isr, Serial::RxIrq);
+    uartBLE.attach(&uartBLE_isr, Serial::RxIrq);
 }
 
 void comUpdate()
@@ -79,7 +78,7 @@ void comUpdate()
 
 void BLEWrite(const char * str)
 {
-    comWrite("Boca Boocaaa");
+    comWrite("Boca Boocaaa \n\n");
 }
 
 //=====[Implementations of private functions]==================================
@@ -88,62 +87,37 @@ static void comWrite(const char* str)
 {
     //  paso a estado quiero transmitir datos
     uartState = TX_STATUS;
-    printf("UART escribo: %s\n", str);
+    printf("UART escribo: %s", str);
     uartBLE.printf("%s", str);
 }
 
 // Falta incluir el delay no bloqueante para usar de timeout 
 // por si se queda colgado en este método
-static char* comRead()
+bool comRead(char* buffer)
 {
-    char c;
-    std::queue<char> localBuffer;
-
-    // Transferir datos del buffer global al buffer local
-    while (!rxBuffer.empty())
+    //printf("comRead -> Inicio \n");
+    if (uartState == RX_BUFFERED)
     {
-        c = rxBuffer.front();
-        rxBuffer.pop();
-        localBuffer.push(c);
-        if (c == '\0')
-        {
-            break;
-        }
+        my_strcpy(buffer, rxBuffer);
+        uartState = RX_READ_COMPLETE;
+        return true;
     }
-
-    // Calcular la longitud del mensaje
-    int length = localBuffer.size();
-    if (length == 0)
-    {
-        return NULL;
-    }
-
-    // Asignar memoria para el mensaje
-    char* sBuffer = (char*)malloc(length + 1);
-    if (sBuffer == NULL)
-    {
-        return NULL;
-    }
-
-    // Copiar el mensaje desde el buffer local a la cadena
-    for (int i = 0; i < length; i++)
-    {
-        sBuffer[i] = localBuffer.front();
-        localBuffer.pop();
-    }
-    sBuffer[length] = '\0';
-
-    //  paso a modo recibi datos
-    uartState = RX_STATUS;
-
-    return sBuffer;
+    return false;
 }
 
-static void rxBuffer_isr()
+static void uartBLE_isr()
 {
-    while (uartBLE.readable())
-    {
-        printf("UART leyendo datos\n");
-        rxBuffer.push(uartBLE.getc());
-    }
+    while (uartBLE.readable()) {
+        char c = uartBLE.getc();
+        //printf("char:%c  \n",c);
+        
+        if (c == '\n' || rxIndex >= BUFFER_SIZE - 1) {
+            rxBuffer[rxIndex] = '\0';
+            uartState = RX_BUFFERED;
+            rxIndex = 0;
+        } else {
+            rxBuffer[rxIndex++] = c;
+        }
+
+    } 
 }
