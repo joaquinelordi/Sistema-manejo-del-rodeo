@@ -50,7 +50,7 @@ void rfidUpdate()
                 rfidStatus = RFID_READING;
 
             else
-                //printf("IDLE: No lei ninguna tarjeta\r\n"); 
+                printf("IDLE: No lei ninguna tarjeta\r\n"); 
 
             break;
 

@@ -15,13 +15,17 @@
 
 //=====[Declaration of private data types]=====================================
 
+
 //=====[Declaration and initialization of public global objects]===============
+
+
 
 //=====[Declaration and initialization of private global objects]===============
 
 Serial  uartBLE(TX, RX, COM_BAUDRATE);
 
-static char rxBuffer[BUFFER_SIZE];
+static char rxBuffer[BUFFER_RX_SIZE];
+static char txBuffer[BUFFER_TX_SIZE];
 static volatile int rxIndex = 0;
 
 //=====[Declaration of external public global variables]=======================
@@ -35,7 +39,7 @@ static uartStatus_t uartState;
 //=====[Declarations (prototypes) of private functions]========================
 
 static void comWrite(const char* str);
-static char* comRead();
+static bool comRead(char*);
 static void uartBLE_isr();
 
 //=====[Implementations of public functions]===================================
@@ -49,69 +53,86 @@ void comInit()
 void comUpdate()
 {
     printf("comUpdate -> Inicio \n");
-/*
+
     switch(uartState)
     {
+        // no hay nada que hacer
+        case RX_READ_COMPLETE:
+            printf("No hay nada que leer/enviar");
+            break;
+
         // hay algo para transmitir
-        case TX_STATUS:
-            // espero un tiempo para transmitir
-            wait_us(TO_MILISEC * 2000);
-            comWrite("AT");
+        case TX_SEND_DATA:
+
+            comWrite(txBuffer);
 
             break;
 
-        case RX_STATUS:
-            // hay algo para leer
-            char* receivedMsg = comRead();
-            if (receivedMsg != NULL)
-            {
-                printf("UART recibi: [%s]\n", receivedMsg);
-                free(receivedMsg); // Liberar la memoria asignada por comRead
-            }
+        // hay algo para leer del buffer
+        case RX_BUFFERED:
+            printf("Hay datos que leer en el buffer");
+            break;   
 
-            break;    
     }
-*/
 
     return;
 }
 
-void BLEWrite(const char * str)
+void BLEWrite(const char* str)
 {
-    comWrite("Boca Boocaaa \n\n");
+    my_strcpy(txBuffer, str);
+    //Cambio estado a enviar datos
+    uartState = TX_SEND_DATA;
+
+}
+
+bool BLERead(char* buffer)
+{
+    bool ret = false;
+
+    char str[BUFFER_RX_SIZE];
+    if (comRead(str))
+    {
+        my_strcpy(buffer, str);
+        ret = true;
+    }
+    
+    return ret;
+}
+
+uartStatus_t getStateBLECom()
+{
+    return uartState;
 }
 
 //=====[Implementations of private functions]==================================
 
 static void comWrite(const char* str)
 {
-    //  paso a estado quiero transmitir datos
-    uartState = TX_STATUS;
     printf("UART escribo: %s", str);
     uartBLE.printf("%s", str);
 }
 
-// Falta incluir el delay no bloqueante para usar de timeout 
-// por si se queda colgado en este método
-bool comRead(char* buffer)
+bool comRead(char* str)
 {
     //printf("comRead -> Inicio \n");
     if (uartState == RX_BUFFERED)
     {
-        my_strcpy(buffer, rxBuffer);
+        my_strcpy(str, rxBuffer);
         uartState = RX_READ_COMPLETE;
         return true;
     }
     return false;
 }
 
+// Falta incluir el delay no bloqueante para usar de timeout 
+// por si se queda colgado en este método
 static void uartBLE_isr()
 {
     while (uartBLE.readable()) {
         char c = uartBLE.getc();
-        //printf("char:%c  \n",c);
         
-        if (c == '\n' || rxIndex >= BUFFER_SIZE - 1) {
+        if (c == '\n' || rxIndex >= BUFFER_RX_SIZE - 1) {
             rxBuffer[rxIndex] = '\0';
             uartState = RX_BUFFERED;
             rxIndex = 0;

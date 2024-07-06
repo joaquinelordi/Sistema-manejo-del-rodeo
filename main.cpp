@@ -12,17 +12,22 @@ int main()
     comInit();
     relayInit();
 
+    printf("Init completado");
+
     while(true)
     {
-        //printf("while principal \n");
+
         led1 = !led1;
-        //printf("En el loop principal  \n");
-        BLEWrite("BOCAA");
+        BLEWrite("BOCAA BOOCAAA\n");
+        comUpdate();
         wait_us(TO_MILISEC * 4000);
-        //comUpdate();
-        char buffer[BUFFER_SIZE];
-        if (comRead(buffer)) {
-            printf("Received: %s\n\n", buffer);
+        if (getStateBLECom() == RX_BUFFERED)
+        {   
+            char buffer[BUFFER_SIZE];
+            if(BLERead(buffer))
+            {
+                printf("Received: %s\n\n", buffer);
+            }
         }
     }
 

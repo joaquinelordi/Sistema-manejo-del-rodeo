@@ -7,15 +7,16 @@
 
 //=====[Declaration of public defines]=========================================
 
-#define BUFFER_SIZE 32
-
+#define BUFFER_TX_SIZE 32
+#define BUFFER_RX_SIZE 32
 
 //=====[Declaration of public data types]======================================
-
 typedef enum{
-    TX_STATUS,
+    TX_SEND_DATA,
     RX_BUFFERED,
-    RX_READ_COMPLETE
+    RX_READ_COMPLETE,
+    
+    
 } uartStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
@@ -26,7 +27,10 @@ void comUpdate();
 
 void BLEWrite(const char *);
 
-bool comRead(char*);
+bool BLERead(char *);
+
+uartStatus_t getStateBLECom();
+
 
 //=====[#include guards - end]=================================================
 
