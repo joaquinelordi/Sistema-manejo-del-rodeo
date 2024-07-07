@@ -1,47 +1,61 @@
 #include "mbed.h"
-//#include "rfid.h"
-//#include "uart_BLE.h"
-//#include "relay.h"
-#include "tag.h"
+#include "rfid.h"
+#include "uart_BLE.h"
+#include "relay.h"
+#include "tagLITE.h"
 
 
 DigitalOut led1(LED1);
 
+
 // PlayGround para probal als clases tag listaTags
 int main()
 {
-    //comInit();
+    rfidInit();
+    comInit();
+    relayInit();
 
     // inicialize
-    char* tag1 = "tag1";
-    char* tag2 = "tag2";
-    char* tag3 = "tag3";
-    char* tag4 = "tag4";
-
-    TagList* pTagList = new TagList();
-    Tag* pTag1 = new Tag(tag1);
-    Tag* pTag2 = new Tag(tag2);
-    Tag* pTag3 = new Tag(tag3);
-    Tag* pTag4 = new Tag(tag4);
-
-    pTagList->addTag(tag1);
-    pTagList->addTag(tag2);
-    pTagList->addTag(tag3);
-    pTagList->addTag(tag4);
-
-
-    printf("TagList_size[%d]", pTagList->getTagListSize());
-
-    if(pTagList->find(tag1))
-    {
-        printf("encontre el tag:%s \n", tag1);
-    }    
-
-    pTagList->removeTag(tag1);
-    if(!pTagList->find(tag1))
-    {
-        printf("NO encontre el tag:%s \n", tag1);
-    } 
+// Crear una instancia de TagLITE
+    TagLITE tag1;
+    TagLITE_initWithUID(&tag1, "ABC123");
+    printf("Tag1 UID: %s\n", TagLITE_getUID(&tag1));
+    
+    // Crear una instancia de TagListLITE
+    TagListLITE tagList;
+    TagListLITE_init(&tagList);
+    
+    // Agregar tags a la lista
+    TagListLITE_addTag(&tagList, "ABC123");
+    TagListLITE_addTag(&tagList, "DEF456");
+    TagListLITE_addTag(&tagList, "GHI789");
+    
+    // Mostrar la cantidad de tags en la lista
+    printf("TagList size: %zu\n", TagListLITE_getSize(&tagList));
+    
+    // Buscar un tag en la lista
+    if (TagListLITE_find(&tagList, "DEF456")) {
+        printf("Tag DEF456 encontrado en la lista.\n");
+    } else {
+        printf("Tag DEF456 no encontrado en la lista.\n");
+    }
+    
+    // Remover un tag de la lista
+    TagListLITE_removeTag(&tagList, "DEF456");
+    
+    // Mostrar la cantidad de tags en la lista después de la eliminación
+    printf("TagList size after removal: %zu\n", TagListLITE_getSize(&tagList));
+    
+    // Intentar buscar el tag eliminado
+    if (TagListLITE_find(&tagList, "DEF456")) {
+        printf("Tag DEF456 encontrado en la lista.\n");
+    } else {
+        printf("Tag DEF456 no encontrado en la lista.\n");
+    }
+    
+    // Limpiar la lista de tags
+    TagListLITE_clear(&tagList);
+    printf("TagList size after clearing: %zu\n", TagListLITE_getSize(&tagList));
 
     return 0;
 }

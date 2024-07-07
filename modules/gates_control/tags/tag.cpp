@@ -1,10 +1,10 @@
+
 //=====[Libraries]=============================================================
 #include "mbed.h"
 #include "arm_book_lib.h"
 #include "tag.h"
 #include <cstring>
 #include "my_stdlib.h"
-#include <vector>
 
 
 //=====[Declaration of private defines]========================================
@@ -31,11 +31,14 @@ Tag::Tag()
 {
     memset(_UID, 0, sizeof(_UID));
     _UID_size = 0;
+    _tagStatus = TAG_NONE;
 }
 
 Tag::Tag(const char *UID)
 {
     my_strcpy(_UID, UID);
+    _UID_size = sizeof(_UID);
+    _tagStatus = TAG_ENABLE;
 }
 
 Tag::~Tag()
@@ -51,7 +54,8 @@ const char* Tag::getTagUID() const
 
 TagList::TagList()
 {
-
+    memset(_listTags, 0, sizeof(_listTags));
+    _listSize = 0;
 }
 
 TagList::~TagList()
@@ -59,19 +63,35 @@ TagList::~TagList()
 
 }
 
+void Tag::clear()
+{
+     memset(_UID, 0, sizeof(_UID));
+    _UID_size = 0;
+    _tagStatus = TAG_DISABLE;
+}
 
 void TagList::addTag(const char *UID)
 {
-    tags.push_back(UID);
+    // _listSize -> ultimo elemento del arreglo
+    if (_listSize < MAX_LIST_SIZE)
+    {
+        _listTags[_listSize] = Tag(UID);
+        _listSize++;
+        printf("TagList: Tag agregado: %s\n", UID);
+    }
+    else
+    {
+        printf("TagList: lista llena.\n");
+    }
 }
 
 bool TagList::find(const char *UID)
 {
-    for (size_t i = 0; i < tags.size(); ++i)
+    for (size_t i = 0; i < _listSize; ++i)
     {
-        if (strcmp(tags[i].getTagUID(), UID) == 0)
+        if (strcmp(_listTags[i].getTagUID(), UID) == 0)
         {
-            printf("TagList eencontre el Tag: %s", UID);
+            printf("TagList encontre el Tag: %s", UID);
             return true;
         }
     }
@@ -79,23 +99,19 @@ bool TagList::find(const char *UID)
 }
 
 
-void TagList::removeTag(const char *UID)
+void TagList::clear()
 {
-    for (size_t i = 0; i < tags.size(); ++i) {
-        if (strcmp(tags[i].getTagUID(), UID) == 0) {
-            tags.erase(tags.begin() + i);
-            return;
-        }
+    for (size_t i = 0; i < _listSize; ++i)
+    {
+        _listTags[i].clear();
+        _listSize = 0;
     }
-}
-
-void TagList::clear() {
-    tags.clear();
 }
 
 size_t TagList::getTagListSize()
 {
-    return tags.size();
+    return _listSize;
 }
 
 //=====[Implementations of private functions]==================================
+

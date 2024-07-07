@@ -1,3 +1,4 @@
+
 //=====[#include guards - begin]===============================================
 
 #ifndef _TAG_H_
@@ -7,7 +8,7 @@
 //=====[Declaration of public defines]=========================================
 
 #define UID_MAX_SIZE 10
-
+#define MAX_LIST_SIZE 5
 
 //=====[Declaration of public data types]======================================
 
@@ -27,7 +28,6 @@ typedef enum{
 #ifndef TAGLIST_H
 #define TAGLIST_H
 
-#include <vector>
 #include <cstring>
 
 class Tag {
@@ -43,8 +43,7 @@ public:
 private:
     char _UID[UID_MAX_SIZE];
     size_t _UID_size;
-    tagStatus_t tagStatus;
-
+    tagStatus_t _tagStatus;
 
 };
 
@@ -55,14 +54,13 @@ public:
     
     void addTag(const char *);
     bool find(const char *);
-    void removeTag(const char *);
     void clear();
     //const char* getTag(const char *UID);
     size_t getTagListSize();
 
 private:
-    std::vector<Tag> tags;
-
+    Tag _listTags[MAX_LIST_SIZE];
+    size_t _listSize;
 
 };
 
@@ -70,3 +68,4 @@ private:
 
 
 #endif // _TAG_H_
+
