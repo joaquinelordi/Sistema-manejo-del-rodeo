@@ -1,4 +1,3 @@
-
 //=====[#include guards - begin]===============================================
 
 #ifndef _TAG_H_
@@ -7,19 +6,27 @@
 
 //=====[Declaration of public defines]=========================================
 
-#define UID_MAX_SIZE 10
-#define MAX_LIST_SIZE 5
+#define UID_MAX_SIZE 32
+#define MAX_LIST_SIZE 20
 
 //=====[Declaration of public data types]======================================
 
-typedef enum{
+typedef enum
+{
     TAG_ENABLE,
     TAG_DISABLE,
     TAG_ERROR,
-    TAG_NONE
-       
-} tagStatus_t;
+    TAG_NONE      
 
+    } tagStatus_t;
+
+typedef enum
+{
+    GROUP_DEFAULT,
+    GROUP_A,
+    GROUP_B
+
+    } group_t;
 //=====[Declarations (prototypes) of public functions]=========================
 
 
@@ -33,16 +40,18 @@ typedef enum{
 class Tag {
 public:
     Tag();
-    Tag(const char *);
+    Tag(const char *, group_t = GROUP_DEFAULT);
     ~Tag();
     
-    // Métodos publicos
+
     const char* getTagUID() const;
     void clear();
+    group_t getAssignedGroup();
 
 private:
     char _UID[UID_MAX_SIZE];
     size_t _UID_size;
+    group_t _assignedGroup;
     tagStatus_t _tagStatus;
 
 };
@@ -52,10 +61,10 @@ public:
     TagList();
     ~TagList();
     
-    void addTag(const char *);
+    void addTag(const Tag *);
     bool find(const char *);
     void clear();
-    //const char* getTag(const char *UID);
+    Tag* getTag(const char *);
     size_t getTagListSize();
 
 private:

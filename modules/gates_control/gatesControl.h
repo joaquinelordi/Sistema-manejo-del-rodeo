@@ -1,33 +1,37 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _RELAY_H_
-#define _RELAY_H_
+#ifndef _GATESCONTROL_H_
+#define _GATESCONTROL_H_
 
 #include "mbed.h"
+#include "tag.h"
+
 
 //=====[Declaration of public defines]=========================================
 
-// Nucleo Pin for Relay-2CH
-#define IN_1        PA_1
-#define IN_2        PA_0
+#define TAG1_UID "BOCA"
+#define TAG2_UID "JUNIORS"
 
 //=====[Declaration of public data types]======================================
 
-typedef enum{
-    RELAY_ON,
-    RELAY_OFF
-} relayStatus_t;
+typedef enum
+{
+    CONTROL_GATES_IDLE,
+    TAG_QUEUE,
+    OPEN_GATES,
+    CLOSE_GATES,
+    CONTROL_GATES_DESACTIVATED
+
+    } controlGatesStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-//RELAY DEBERIA SER UNA CLASE, que se inicialize con el pin asociado
-void relayInit();
-void relayUpdate();
-void relay_1_ON();
-void relay_1_OFF();
-void relay_2_ON();
-void relay_2_OFF();
+void gatesControlInit();
+void gatesControlUpdate();
+void openGate(group_t group);
+void closeGate(group_t group);
+
 
 //=====[#include guards - end]=================================================
 
-#endif // _RELAY_H_
+#endif // _GATESCONTROL_H_

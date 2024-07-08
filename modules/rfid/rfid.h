@@ -22,11 +22,13 @@
 
 //=====[Declaration of public data types]======================================
 
-typedef enum{
+typedef enum
+{
     RFID_IDLE,
     RFID_READING,
     RFID_READ_COMPLETED_VALID_CARD
-} rfidStatus_t;
+
+    } rfidStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
 

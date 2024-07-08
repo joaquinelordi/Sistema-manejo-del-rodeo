@@ -2,67 +2,11 @@
 #include "rfid.h"
 #include "uart_BLE.h"
 #include "relay.h"
-#include "tagLITE.h"
-
+//#include "tagLITE.h"
+#include "tag.h"
 
 DigitalOut led1(LED1);
 
-
-// PlayGround para probal als clases tag listaTags
-int main()
-{
-    rfidInit();
-    comInit();
-    relayInit();
-
-    // inicialize
-// Crear una instancia de TagLITE
-    TagLITE tag1;
-    TagLITE_initWithUID(&tag1, "ABC123");
-    printf("Tag1 UID: %s\n", TagLITE_getUID(&tag1));
-    
-    // Crear una instancia de TagListLITE
-    TagListLITE tagList;
-    TagListLITE_init(&tagList);
-    
-    // Agregar tags a la lista
-    TagListLITE_addTag(&tagList, "ABC123");
-    TagListLITE_addTag(&tagList, "DEF456");
-    TagListLITE_addTag(&tagList, "GHI789");
-    
-    // Mostrar la cantidad de tags en la lista
-    printf("TagList size: %zu\n", TagListLITE_getSize(&tagList));
-    
-    // Buscar un tag en la lista
-    if (TagListLITE_find(&tagList, "DEF456")) {
-        printf("Tag DEF456 encontrado en la lista.\n");
-    } else {
-        printf("Tag DEF456 no encontrado en la lista.\n");
-    }
-    
-    // Remover un tag de la lista
-    TagListLITE_removeTag(&tagList, "DEF456");
-    
-    // Mostrar la cantidad de tags en la lista después de la eliminación
-    printf("TagList size after removal: %zu\n", TagListLITE_getSize(&tagList));
-    
-    // Intentar buscar el tag eliminado
-    if (TagListLITE_find(&tagList, "DEF456")) {
-        printf("Tag DEF456 encontrado en la lista.\n");
-    } else {
-        printf("Tag DEF456 no encontrado en la lista.\n");
-    }
-    
-    // Limpiar la lista de tags
-    TagListLITE_clear(&tagList);
-    printf("TagList size after clearing: %zu\n", TagListLITE_getSize(&tagList));
-
-    return 0;
-}
-
-
-
-/*
 int main()
 {
     rfidInit();
@@ -90,7 +34,63 @@ int main()
     }
 
 }
+
+
+
+
+
+/*
+//PROBADO CON TAG Y TAGLITE 
+// PlayGround para probar las clases tag listaTags
+int main()
+{
+    rfidInit();
+    comInit();
+    relayInit();
+
+    // inicialize
+    Tag* pTag1 = new Tag("Bokita");
+    Tag* pTag2 = new Tag("El mas grande");
+    Tag* pTag3 = new Tag("aguante booocaaaa");
+        
+    TagList* pTagList = new TagList();
+    
+    printf("Tag1 UID: %s\n", pTag1->getTagUID());
+
+
+    pTagList->addTag(pTag1);
+    pTagList->addTag(pTag2);
+    pTagList->addTag(pTag3);
+    
+    printf("TagList size: %d\n", pTagList->getTagListSize());
+    
+    // prueba de metodos
+    if (pTagList->find(pTag1->getTagUID()))
+    {
+        printf("Tag encontrado en la lista: %s\n", pTag1->getTagUID());
+    }
+    else
+    {
+        printf("Tag no encontrado en la lista.\n");
+    }
+    
+    pTagList->clear();
+
+    printf("TagList despues de clear() \n", pTagList->getTagListSize());
+
+    if (pTagList->find(pTag1->getTagUID()))
+    {
+        printf("Tag encontrado en la lista: %s\n", pTag1->getTagUID());
+    }
+    else
+    {
+        printf("Tag no encontrado en la lista.\n");
+    }
+
+    return 0;
+}
 */
+
 
 
 /*
