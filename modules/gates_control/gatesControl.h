@@ -9,8 +9,10 @@
 
 //=====[Declaration of public defines]=========================================
 
-#define TAG1_UID "BOCA"
-#define TAG2_UID "JUNIORS"
+#define TAG1_UID "8CA7B544" // Card Test
+#define TAG2_UID "96E48FCA" // Norvial
+#define TAG3_UID "EL+GRANDE"
+#define DELAY_CLOSE_GATE_MS 5000
 
 //=====[Declaration of public data types]======================================
 
