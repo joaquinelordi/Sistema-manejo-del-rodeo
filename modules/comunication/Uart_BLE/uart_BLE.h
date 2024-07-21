@@ -7,8 +7,8 @@
 
 //=====[Declaration of public defines]=========================================
 
-#define BUFFER_TX_SIZE 128
-#define BUFFER_RX_SIZE 128
+#define BUFFER_TX_SIZE 512
+#define BUFFER_RX_SIZE 512
 
 //=====[Declaration of public data types]======================================
 typedef enum{

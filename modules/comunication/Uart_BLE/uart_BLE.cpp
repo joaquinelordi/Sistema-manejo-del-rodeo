@@ -1,6 +1,6 @@
 //=====[Libraries]=============================================================
-#include "mbed.h"
 #include "uart_BLE.h"
+#include "mbed.h"
 #include "my_stdlib.h"
 #include <cstring>
 
@@ -14,12 +14,7 @@
 #define TO_MILISEC 1000 //msec factor
 
 //=====[Declaration of private data types]=====================================
-
-
 //=====[Declaration and initialization of public global objects]===============
-
-
-
 //=====[Declaration and initialization of private global objects]===============
 
 Serial  uartBLE(TX, RX, COM_BAUDRATE);
@@ -46,10 +41,8 @@ static void uartBLE_isr();
 
 void comInit()
 {
-    printf("comInit -> Inicio \n");
     uartBLE.attach(&uartBLE_isr, Serial::RxIrq);
     uartState = COM_IDLE;
-    printf("comInit -> Fin \n");
 }
 
 void comUpdate()
@@ -60,7 +53,7 @@ void comUpdate()
     {
         // no hay nada que hacer
         case RX_READ_COMPLETE:
-            printf("No hay nada que leer/enviar");
+            printf("No hay nada que leer/enviar\n");
             uartState = COM_IDLE;
             break;
 
@@ -73,7 +66,7 @@ void comUpdate()
 
         // hay algo para leer del buffer
         case RX_BUFFERED:
-            printf("Hay datos que leer en el buffer");
+            printf("Hay datos que leer en el buffer\n");
             break;   
 
         case COM_IDLE:
