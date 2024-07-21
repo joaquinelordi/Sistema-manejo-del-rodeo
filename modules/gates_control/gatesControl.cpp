@@ -5,6 +5,7 @@
 #include "tag.h"
 #include "relay.h"
 #include "non_blocking_delay.h"
+#include "stringParser.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -35,6 +36,7 @@ Tag* pTag3 = new Tag(TAG3_UID);
 static controlGatesStatus_t gatesControlState;
 static char* pUIDQueue = NULL;
 static Tag* pTagQueue = NULL;
+static char _strTag[MAX_SIZE_SERIALIZE_TAG];
 static bool isControlGatesActivated;
 static nonBlockingDelay_t timerCloseGate;
 
@@ -42,7 +44,7 @@ static nonBlockingDelay_t timerCloseGate;
 
 // para inicializar a que corral se asocia cada puerta a traves de defines
 //void gateInit();
-
+void _tagListUpdate();
 
 //=====[Implementations of public functions]===================================
 
@@ -79,8 +81,6 @@ void gatesControlUpdate()
                 printf("gatesControlUpdate-> Lei una tarjeta \n");
                 gatesControlState = TAG_QUEUE;
             }
-                
-
             break;
 
         case TAG_QUEUE:
@@ -100,9 +100,16 @@ void gatesControlUpdate()
 
             if(pUIDQueue != NULL )
             {
-                printf("gatesControlUpdate-> OPEN_GATES UID[%s]", pUIDQueue);
-                pTagQueue = pTagListGatesControl->getTag(pUIDQueue);
-                openGate(pTagQueue->getAssignedGroup());
+                printf("gatesControlUpdate-> OPEN_GATES UID[%s]\n", pUIDQueue);
+                if(pTagListGatesControl->find(pUIDQueue))
+                {
+
+                    pTagQueue = pTagListGatesControl->getTag(pUIDQueue);
+                    openGate(pTagQueue->getAssignedGroup());
+                }
+                // si el tag no esta en la lista igualmente abro la puerta por defecto
+                else
+                    openGate(GROUP_DEFAULT);
             }            
             break;
         
@@ -119,8 +126,11 @@ void gatesControlUpdate()
         case CONTROL_GATES_DESACTIVATED:
             break;
 
+        case UPDATE_TAG_LIST:
+            _tagListUpdate();
+            gatesControlState = CONTROL_GATES_IDLE;
+            break;    
     }
-
 }
 
 //=====[Implementations of private functions]==================================
@@ -131,13 +141,16 @@ void openGate(group_t group)
     switch (group)
     {
         case GROUP_A:
+            printf("openGate -> Group A \n");
             relay_1_ON();
             break;
         
         case GROUP_B:
+            printf("openGate -> Group B \n");
             relay_2_ON();
             break;
         case GROUP_DEFAULT:
+            printf("openGate -> Group Default \n");
             relay_1_ON();
             break;
     }
@@ -156,4 +169,38 @@ void closeGate(group_t group)
     relay_1_OFF();
     relay_2_OFF();
     relayUpdate();
+}
+
+void setStrTag(char *str)
+{
+    if (str != NULL)
+    {
+        my_strcpy(_strTag,  str);
+        // cargo el tag serializado y cambio al estado a actualizar lista de tags
+        gatesControlState = UPDATE_TAG_LIST;
+        printf("setStrTag -> str[%s], _strTag[%s] \n", str, _strTag);
+    }
+}
+void _tagListUpdate()
+{
+    printf("_tagListUpdate Inicio strTag[%s] \n", _strTag);
+    if (isAValidTag(_strTag))
+    {
+        Tag* pTag = NULL;
+        char ** sTag = deserializeTag(_strTag);
+
+        // Si esta en la lista actualizo el grupo asignado
+        if (pTagListGatesControl->find(_strTag))
+        {
+            printf("_tagListUpdate-> actualizo corral de tag:%s \n", _strTag);
+            pTag = pTagListGatesControl->getTag(_strTag);
+            pTag->setAssignedGroup(sTag[1]);
+        }
+        // agrego el nuevo tag
+        else
+        {
+            pTag = new Tag(sTag[0], sTag[1]);
+            pTagListGatesControl->addTag(pTag);
+        }
+    }
 }

@@ -11,8 +11,9 @@
 
 #define TAG1_UID "8CA7B544" // Card Test
 #define TAG2_UID "96E48FCA" // Norvial
-#define TAG3_UID "EL+GRANDE"
-#define DELAY_CLOSE_GATE_MS 5000
+#define TAG3_UID "7BC01807"
+#define DELAY_CLOSE_GATE_MS 3000
+#define MAX_SIZE_SERIALIZE_TAG 30
 
 //=====[Declaration of public data types]======================================
 
@@ -22,7 +23,8 @@ typedef enum
     TAG_QUEUE,
     OPEN_GATES,
     CLOSE_GATES,
-    CONTROL_GATES_DESACTIVATED
+    CONTROL_GATES_DESACTIVATED,
+    UPDATE_TAG_LIST
 
     } controlGatesStatus_t;
 
@@ -32,6 +34,7 @@ void gatesControlInit();
 void gatesControlUpdate();
 void openGate(group_t group);
 void closeGate(group_t group);
+void setStrTag(char *);
 
 
 //=====[#include guards - end]=================================================
