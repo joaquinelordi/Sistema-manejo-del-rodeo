@@ -26,17 +26,13 @@ tick_t tickRead();
 
 void tickInit()
 {
-    printf("tickInit -> Inicio \n");
     ticker.attach( tickerCallback, ((float) 0.001 ));
-    printf("tickInit -> Fin \n");
 }
 
 void nonBlockingDelayInit( nonBlockingDelay_t * delay, tick_t durationValue )
 {
-    printf("nonBlockingDelayInit -> Inicio \n");
     delay->duration = durationValue;
     delay->isRunning = false;
-    printf("nonBlockingDelayInit -> Fin \n");
 }
 
 bool nonBlockingDelayRead( nonBlockingDelay_t * delay )
