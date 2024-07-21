@@ -34,11 +34,10 @@ static rfidStatus_t rfidStatus;
 
 void rfidInit()
 {
-    // Init. RC522 Chip
-    //printf("RFID Init starting...\r\n");
+    printf("RFID Init starting...\r\n");
     RfChip.PCD_Init();
-    rfidStatus  = RFID_IDLE;
-    //printf("init passed\r\n");
+    rfidStatus  = RFID_READING;
+    printf("init passed\r\n");
 }
 
 void rfidUpdate()
@@ -53,8 +52,9 @@ void rfidUpdate()
                 rfidStatus = RFID_READING;
 
             else
-                printf("IDLE: No lei ninguna tarjeta\r\n"); 
-
+            {
+                //printf("rfid IDLE: No lei ninguna tarjeta\r\n"); 
+            }
             break;
 
         case RFID_READING:
@@ -71,11 +71,11 @@ void rfidUpdate()
                     }
                     // termino la cadena con un \0
                     rfidBuffer[RfChip.uid.size * 2] = '\0';
-                    //printf("Buffer[%s]\n", buffer);
+                    printf("Buffer[%s]\n", rfidBuffer);
                     
                     // Print Card type
                     uint8_t piccType = RfChip.PICC_GetType(RfChip.uid.sak);
-                    //printf("PICC Type: %s \n\r", RfChip.PICC_GetTypeName(piccType));
+                    printf("PICC Type: %s \n\r", RfChip.PICC_GetTypeName(piccType));
 
                     // proceso la tarjeta y luego cambio el estado
                     rfidStatus = RFID_READ_COMPLETED_VALID_CARD;
@@ -90,7 +90,7 @@ void rfidUpdate()
 
         case RFID_READ_COMPLETED_VALID_CARD:
 
-            printf("Tarjeta leida, esperando ser procesada\r\n");
+            //printf("Tarjeta leida, esperando ser procesada\r\n");
                 
             break;    
 
@@ -129,7 +129,7 @@ char* rfidReadUID()
     
     //printf("rfidReadUID() -> RelayON \n");
 
-    rfidStatus = RFID_IDLE; // Ya procesé el UID ingresado, espero que se lea
+    rfidStatus = RFID_READING; // Ya procesé el UID ingresado, espero que se lea
 
     return aux;
 }

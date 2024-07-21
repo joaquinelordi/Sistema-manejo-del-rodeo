@@ -48,24 +48,27 @@ void comInit()
 {
     printf("comInit -> Inicio \n");
     uartBLE.attach(&uartBLE_isr, Serial::RxIrq);
+    uartState = COM_IDLE;
+    printf("comInit -> Fin \n");
 }
 
 void comUpdate()
 {
-    printf("comUpdate -> Inicio \n");
+    //printf("comUpdate -> Inicio \n");
 
     switch(uartState)
     {
         // no hay nada que hacer
         case RX_READ_COMPLETE:
             printf("No hay nada que leer/enviar");
+            uartState = COM_IDLE;
             break;
 
         // hay algo para transmitir
         case TX_SEND_DATA:
 
             comWrite(txBuffer);
-
+            uartState = COM_IDLE;
             break;
 
         // hay algo para leer del buffer
@@ -73,7 +76,11 @@ void comUpdate()
             printf("Hay datos que leer en el buffer");
             break;   
 
+        case COM_IDLE:
+            break;    
+
     }
+    //printf("comUpdate -> Fin \n");
 
     return;
 }

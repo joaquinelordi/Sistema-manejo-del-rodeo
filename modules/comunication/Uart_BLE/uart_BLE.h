@@ -12,12 +12,11 @@
 
 //=====[Declaration of public data types]======================================
 typedef enum{
+    COM_IDLE,
     TX_SEND_DATA,
     RX_BUFFERED,
     RX_READ_COMPLETE,
-    
-    
-} uartStatus_t;
+    } uartStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
 
