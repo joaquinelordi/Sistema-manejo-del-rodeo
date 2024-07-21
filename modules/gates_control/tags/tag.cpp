@@ -45,6 +45,29 @@ Tag::Tag(const char *UID, group_t assignedGroup)
     _assignedGroup = assignedGroup;
 }
 
+Tag::Tag(const char *UID, const char *sGroup)
+{
+    my_strcpy(_UID, UID);
+    _UID_size = sizeof(_UID);
+    _tagStatus = TAG_ENABLE;
+
+    if(*sGroup == 'A')
+    {
+        printf("Tag-> se asigna grupo A\n");
+        _assignedGroup = GROUP_A;
+    }
+    else if(*sGroup == 'B')
+    {
+        printf("Tag-> se asigna grupo B\n");
+         _assignedGroup = GROUP_B;
+    }
+    else
+    {
+        printf("Tag-> se asigna grupo por default\n");
+        _assignedGroup = GROUP_DEFAULT;        
+    }    
+}
+
 Tag::~Tag()
 {
 
@@ -60,7 +83,24 @@ group_t Tag::getAssignedGroup()
     return _assignedGroup;
 }
 
-
+void Tag::setAssignedGroup(char *sGroup)
+{
+    if(*sGroup == 'A')
+    {
+        printf("Tag-> se asigna grupo A\n");
+        _assignedGroup = GROUP_A;
+    }
+    else if(*sGroup == 'B')
+    {
+        printf("Tag-> se asigna grupo B\n");
+         _assignedGroup = GROUP_B;
+    }
+    else
+    {
+        printf("Tag-> se asigna grupo por default\n");
+        _assignedGroup = GROUP_DEFAULT;        
+    }  
+}
 
 // CLASE TAG LIST
 
@@ -103,7 +143,7 @@ bool TagList::find(const char *UID)
     {
         if (strcmp(_listTags[i].getTagUID(), UID) == 0)
         {
-            printf("TagList encontre el Tag: %s", UID);
+            printf("TagList encontre el Tag: %s\n", UID);
             return true;
         }
     }

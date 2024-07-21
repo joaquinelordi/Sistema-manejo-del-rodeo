@@ -22,7 +22,7 @@ typedef enum
 
 typedef enum
 {
-    GROUP_DEFAULT,
+    GROUP_DEFAULT = 0,
     GROUP_A,
     GROUP_B
 
@@ -37,16 +37,19 @@ typedef enum
 
 #include <cstring>
 
-class Tag {
+class Tag
+{
 public:
     Tag();
     Tag(const char *, group_t = GROUP_DEFAULT);
+    Tag(const char *, const char *);
     ~Tag();
     
 
     const char* getTagUID() const;
     void clear();
     group_t getAssignedGroup();
+    void setAssignedGroup(char*);
 
 private:
     char _UID[UID_MAX_SIZE];
@@ -56,7 +59,8 @@ private:
 
 };
 
-class TagList {
+class TagList
+{
 public:
     TagList();
     ~TagList();
